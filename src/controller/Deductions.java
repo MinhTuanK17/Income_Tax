@@ -16,13 +16,9 @@ import model.PersonDependent;
 public class Deductions {
 
     private PersonDependent pd;
-    private int numBroSis;
-    private int numChild;
 
     public Deductions(PersonDependent pd) {
         this.pd = pd;
-        numChild = 0;
-        numBroSis = 1;
     }
 
     public double deductionSeft() {
@@ -31,12 +27,15 @@ public class Deductions {
 
     public double deductionChild() {
         double deductionC = 0;
-
+        int numChild = 0;
+        
         for (Children child : pd.getChild()) {
             if (child.getAge() <= 18 || child.isIsStudying()) {
-                deductionC = Math.min(child.getNumber(), 2) * 4400000;
                 numChild++;
-            } else if (child.getAge() > 18 && !child.isIsStudying()) {
+                if (numChild <= 2) {
+                    deductionC += 4400000; 
+                }
+            } else if (child.getAge() > 23 || !child.isIsStudying()) {
                 break;
             }
         }
@@ -45,7 +44,8 @@ public class Deductions {
 
     public double deductionParent() {
         double deductionP = 0;
-
+        int numBroSis = 1;
+        
         for (Parent parent : pd.getParents()) {
             if (parent.getAge() >= 60) {
                 for (BroSis brosis : pd.getBrosis()) {
@@ -53,15 +53,19 @@ public class Deductions {
                         numBroSis++;
                     }
                 }
-                deductionP = 4400000 / numBroSis;
+                deductionP += 4400000 / numBroSis;
                 break;
             }
         }
         return deductionP;
     }
 
+    public double deductionDependent() {
+        return deductionSeft() + deductionChild() + deductionParent();
+    }
+
     public double taxIncome() {
-        double taxIncome = pd.getTotalIncome() - deductionSeft() - deductionChild() - deductionParent();
+        double taxIncome = pd.getTotalIncome() - deductionDependent();
 
         if (taxIncome <= 11000000) {
             System.err.println("Taxable Income: 0");
@@ -87,6 +91,6 @@ public class Deductions {
         System.out.println("Deduction for supporting parents...");
         System.out.println("-----> Deduction  : " + deductionParent());
         System.out.println();
-        System.err.println("Taxable Income    : " + taxIncome());
+        System.out.println("Taxable Income    : " + taxIncome());
     }
 }
