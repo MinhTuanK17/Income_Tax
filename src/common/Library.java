@@ -41,7 +41,7 @@ public class Library {
             String check = getString(msg);
             try {
                 int input = Integer.parseInt(check);
-                if (input <= 0) {
+                if (input < 0) {
                     throw new Exception();
                 }
                 return input;
@@ -56,7 +56,7 @@ public class Library {
             String check = getString(msg);
             try {
                 double input = Double.parseDouble(check);
-                if (input <= 0) {
+                if (input < 0) {
                     throw new Exception();
                 }
                 return input;
